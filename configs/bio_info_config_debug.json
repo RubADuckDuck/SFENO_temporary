@@ -1,0 +1,45 @@
+{
+  "n_x": 100,
+
+  "experiment_id": "Example_RP",
+  "experiment_type": "random partition",
+  "model": "CellBox",
+  "sparse_data": false,
+
+  "network_struct_file": "None",
+
+  "trainset_ratio": 0.7,
+  "validset_ratio": 0.8,
+  "batchsize": 4,
+  "add_noise_level": 0,
+
+  "envelop_form": "tanh",
+  "dT": 0.1,
+  "envelop":0,
+  "ode_degree": 1,
+  "ode_solver": "heun",
+  "ode_last_steps": 2,
+
+  "default": {
+    "lr_val": 0.001,
+    "l1": 1e-4,
+    "l2": 1e-4,
+    "nT": 100
+  },
+
+  "max_epoch": 5,
+
+  "stage_boundary": [1, 2, 3, 4, 5],
+  "stages": [
+    {"lr_val": 0.000001,"l1": 0.01, "n_iter_patience":1000},
+    {"lr_val": 0.0000001,"l1": 0.01},
+    {"lr_val": 0.00000001,"l1": 0.0001},
+    {"lr_val": 0.000000001,"l1": 0.00001},
+    {"nT":200, "lr_val": 0.000001,"l1": 0.0001},
+    {"nT":400,"lr_val": 0.000001,"l1": 0.0001}
+  ],
+
+
+    "export_verbose": 3,
+    "ckpt_name": "model11.ckpt"
+}
