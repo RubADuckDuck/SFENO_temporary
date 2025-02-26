@@ -1,60 +1,97 @@
-# SFENO
+# SFENO: Signal Flow Estimation based on Neural ODE
 
-## Introduction 
-- SFENO represents "**S**ignal **F**low **E**stimation based on **N**eural **O**DE".
+## Introduction
+SFENO represents "**S**ignal **F**low **E**stimation based on **N**eural **O**DE", a flexible framework for modeling biological networks using ordinary differential equations (ODEs). SFENO provides a modular, hardware-agnostic approach to simulate and learn network dynamics.
 
-
-## Run Code
-
-### Run training on Synthetic Data
-First generate synthesized data.
+## Project Structure
+The project is organized as follows:
 ```
-python run_2_gen_rand_net_data.py --network_size 100
-```
-
-Run training
-```
-python run_train_synth_cellbox.py -b 16 ---num_gpu 4 -e 4000 --ddp --network_size 100
-or
-python run_train_synth_exampleNN.py -b 16 ---num_gpu 4 -e 4000 --ddp --network_size 100
+sfeno/
+├── sfeno/                 # Core package code
+├── scripts/               # Organized run scripts 
+│   ├── training/          # Training scripts
+│   ├── evaluation/        # Evaluation scripts
+│   └── data/              # Data generation scripts
+├── configs/               # Configuration files
+├── manuscript/               # For Plotting
+└── README.md
 ```
 
-### Run training on given data
-first put conds.tsv and exp.tsv file under the following path
+## Installation
+```bash
+pip install -e .
 ```
-.../sfeno/datasets/(dataset_name)/
+
+## Usage
+
+### Data Preparation
+
+#### Generate Synthetic Data
+To generate synthetic network data for testing:
+```bash
+python scripts/data/generate_synthetic_data.py --network_size 100
 ```
-like below
+
+#### Prepare Real Biological Data
+First, place your experimental data files under the following path:
 ```
-.../sfeno/datasets/(dataset_name)/conds.tsv
-.../sfeno/datasets/(data_name)/exp.tsv
+sfeno/datasets/(dataset_name)/conds.tsv
+sfeno/datasets/(dataset_name)/exp.tsv
 ```
-set current directory to '.../sfeno/dataset' and run script below
-```
+
+Then convert the data to SFENO format:
+```bash
+cd sfeno/datasets
 python data_converter.py
 ```
-This code will change existing data suitable for Training
 
-If the code ran successfully then you would see files like below   
+This will create the following files:
 ```
-.../sfeno/datasets/(dataset_name)/sfeno_data/conds.tsv   
-.../sfeno/datasets/(dataset_name)/sfeno_data/expr.tsv   
-.../sfeno/datasets/(dataset_name)/sfeno_data/node_Index.json   
-```
-
-Run training 
-```
-python run_train -b 16 ---num_gpu 4 -e 4000 --ddp --data_path .../sfeno/datasets/(dataset_name)/sfeno_data
+sfeno/datasets/(dataset_name)/sfeno_data/conds.tsv   
+sfeno/datasets/(dataset_name)/sfeno_data/expr.tsv   
+sfeno/datasets/(dataset_name)/sfeno_data/node_Index.json
 ```
 
-To run on all existing data run
-```
-python run_on_all_existing_data -b 16 ---num_gpu 4 -e 4000 --ddp
+### Training
+
+#### Train on Synthetic Data
+You can train using either the Cellbox model or the Neural Network model:
+
+**Cellbox Model:**
+```bash
+python scripts/training/train_synthetic.py --model cellbox --batch-size 16 --gpu 4 --epochs 4000 --ddp --network-size 100
 ```
 
-predictions of tests would be saved under 
-```
-.../sfeno/datasets/(dataset_name)/results/(test_index)
+**Neural Network Model:**
+```bash
+python scripts/training/train_synthetic.py --model nn --batch-size 16 --gpu 4 --epochs 4000 --ddp --network-size 100
 ```
 
-Check manuscript for ploting
+#### Train on Real Biological Data
+```bash
+python scripts/training/train.py --batch-size 16 --gpu 4 --epochs 4000 --ddp --data-path sfeno/datasets/(dataset_name)/sfeno_data
+```
+
+#### Train on All Available Datasets
+```bash
+python scripts/training/train_all_datasets.py --batch-size 16 --gpu 4 --epochs 4000 --ddp
+```
+
+### Evaluation
+Model predictions from test data will be saved under:
+```
+sfeno/datasets/(dataset_name)/results/(test_index)
+```
+
+To evaluate a pretrained model:
+```bash
+python scripts/evaluation/evaluate.py --checkpoint path/to/checkpoint.ckpt
+```
+
+## Model Types
+SFENO supports multiple model types:
+- **Cellbox**: Traditional ODE-based model with interaction matrices
+- **NN**: Neural network-based ODE model
+
+## Visualization
+Refer to the manuscript for plotting instructions and result interpretation.
